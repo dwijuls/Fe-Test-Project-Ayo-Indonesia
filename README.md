@@ -1,6 +1,10 @@
-# fetestproject
+# FE Test Project Ayo Indonesia
 
 A new Flutter project.
+
+## How to Run
+- flutter pub get
+- flutter run --release
 
 ## Getting Started
 
