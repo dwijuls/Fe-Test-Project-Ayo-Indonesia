@@ -136,9 +136,9 @@ class _GlobalBottomsheetState extends State<GlobalBottomsheet> {
           // initialChildSize sets the starting height of the bottom sheet.
           initialChildSize: 0.4,
           // minChildSize sets the minimum height of the bottom sheet.
-          minChildSize: 0.25,
+          minChildSize: 0.20,
           // maxChildSize sets the maximum height, allowing it to go full screen.
-          maxChildSize: 0.7,
+          maxChildSize: 0.5,
           expand: false,
           builder: (BuildContext context, ScrollController scrollController) {
             return StatefulBuilder(
@@ -205,7 +205,7 @@ class _GlobalBottomsheetState extends State<GlobalBottomsheet> {
                                                 ],
                                               ),
                                             ),
-                                            _mainCtrl.selectPeriodeId.value == state.periodeItems[index].id ? Icon(Icons.circle_outlined, color: constants.primaryColor, weight: 900,) : Icon(Icons.circle_outlined, color: Colors.black26,)
+                                            _mainCtrl.selectPeriodeId.value == state.periodeItems[index].id ? Icon(Icons.check_circle, color: constants.primaryColor, weight: 900,) : Icon(Icons.circle_outlined, color: Colors.black26,)
                                           ],
                                         ),
                                       ),
@@ -371,292 +371,320 @@ class _GlobalBottomsheetState extends State<GlobalBottomsheet> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
       ),
-      builder: (context) => BlocBuilder<ProvinceBloc, ProvinceState>(
-        builder: (context, state) {
+      builder: (context) {
+        return DraggableScrollableSheet(
+        // initialChildSize sets the starting height of the bottom sheet.
+        initialChildSize: 0.4,
+        // minChildSize sets the minimum height of the bottom sheet.
+        minChildSize: 0.25,
+        // maxChildSize sets the maximum height, allowing it to go full screen.
+        maxChildSize: 0.8,
+        expand: false,
+        builder: (BuildContext context, ScrollController scrollController) {
+        return StatefulBuilder(
+        builder: (BuildContext context, StateSetter setState) {
+          return BlocBuilder<ProvinceBloc, ProvinceState>(
+          builder: (context, state) {
           if (state is ProvinceLoading) {
-            return const Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator());
           } else if (state is ProvinceError) {
-            return Center(child: Text(state.message));
+          return Center(child: Text(state.message));
           } else if (state is ProvinceLoaded) {
-            return DraggableScrollableSheet(
-              initialChildSize: 0.4,
-              // minChildSize sets the minimum height of the bottom sheet.
-              minChildSize: 0.25,
-              // maxChildSize sets the maximum height, allowing it to go full screen.
-              maxChildSize: 0.7,
-                expand: false,
-                builder: (BuildContext context, ScrollController scrollController) {
-                return Container(
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
+            return Container(
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text(
-                                'Pilih Region',
-                                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                              ),
-                              IconButton(
-                                icon: const Icon(Icons.close),
-                                onPressed: () => Navigator.pop(context),
-                              ),
-                            ],
-                          ),
+                        const Text(
+                          'Pilih Region',
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                         ),
-                        if (state.isListView)
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            child: TextField(
-                              decoration: InputDecoration(
-                                hintText: 'Cari nama kota',
-                                prefixIcon: const Icon(Icons.search),
-                                suffixIcon: IconButton(
-                                  icon: const Icon(Icons.clear),
-                                  onPressed: () => context.read<ProvinceBloc>().add(SearchProvinces('')),
-                                ),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                              onChanged: (value) {
-                                context.read<ProvinceBloc>().add(SearchProvinces(value));
-                              },
-                            ),
-                          ),
-                        Expanded(
-                          child: state.isListView
-                              ? ListView.builder(
-                            physics: AlwaysScrollableScrollPhysics(),
-                            itemCount: state.provinces.length,
-                            itemBuilder: (context, index) {
-                              final province = state.provinces[index];
-                              return ListTile(
-                                title: Text(province.nama!),
-                                onTap: () {
-                                  _mainCtrl.selectLocId.value = int.parse(province.id.toString());
-                                  _mainCtrl.selectLocName.value = province.nama.toString();
-                                  context.read<ProvinceBloc>().add(SelectProvince(province.nama!));
-                                  Navigator.pop(context);
-                                },
-                              );
-                            },
-                          )
-                              : GestureDetector(
-                            onTap: () => context.read<ProvinceBloc>().add(ToggleViewMode()),
-                            child: Padding(
-                              padding: const EdgeInsets.all(16),
-                              child: Wrap(
-                                spacing: 8,
-                                runSpacing: 8,
-                                children: state.provinces.take(7).map((province) {
-                                  return ChoiceChip(
-                                      label: Text(province.nama!.toString(),
-                                      ), selected: state.selectedProvince == province.nama!,
-                                      onSelected: (selected) {
-                                        _mainCtrl.selectLocId.value = int.parse(province.id.toString());
-                                        _mainCtrl.selectLocName.value = province.nama.toString();
-                                        context.read<ProvinceBloc>().add(SelectProvince(province.nama!));
-                                        Navigator.pop(context);
-                                      });
-                                }).toList(),
-                              ),
-                            ),
-                          ),
+                        IconButton(
+                          icon: const Icon(Icons.close),
+                          onPressed: () => Navigator.pop(context),
                         ),
                       ],
                     ),
-                  );
-                },
+                  ),
+                  if (state.isListView)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: TextField(
+                        decoration: InputDecoration(
+                          hintText: 'Cari nama kota',
+                          prefixIcon: const Icon(Icons.search),
+                          suffixIcon: IconButton(
+                            icon: const Icon(Icons.clear),
+                            onPressed: () =>
+                                context.read<ProvinceBloc>().add(SearchProvinces('')),
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        onChanged: (value) {
+                          context.read<ProvinceBloc>().add(SearchProvinces(value));
+                        },
+                      ),
+                    ),
+                  Expanded(
+                    child: state.isListView
+                        ? ListView.builder(
+                      physics: AlwaysScrollableScrollPhysics(),
+                      itemCount: state.provinces.length,
+                      itemBuilder: (context, index) {
+                        final province = state.provinces[index];
+                        return ListTile(
+                          title: Text(province.nama!),
+                          onTap: () {
+                            _mainCtrl.selectLocId.value =
+                                int.parse(province.id.toString());
+                            _mainCtrl.selectLocName.value = province.nama.toString();
+                            context.read<ProvinceBloc>().add(
+                                SelectProvince(province.nama!));
+                            Navigator.pop(context);
+                          },
+                        );
+                      },
+                    )
+                        : GestureDetector(
+                      onTap: () => context.read<ProvinceBloc>().add(ToggleViewMode()),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: state.provinces.take(7).map((province) {
+                            return ChoiceChip(
+                                label: Text(province.nama!.toString(),
+                                ),
+                                selected: state.selectedProvince == province.nama!,
+                                onSelected: (selected) {
+                                  _mainCtrl.selectLocId.value =
+                                      int.parse(province.id.toString());
+                                  _mainCtrl.selectLocName.value =
+                                      province.nama.toString();
+                                  context.read<ProvinceBloc>().add(
+                                      SelectProvince(province.nama!));
+                                  Navigator.pop(context);
+                                });
+                          }).toList(),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             );
           }
-          return const SizedBox.shrink();
-        },
-      ),
+          return const SizedBox.shrink();});
+        });
+        }
+        );
+      }
     );
   }
 
   showBottomSheetSelectSports(BuildContext context) {
     showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
-      ),
-      builder: (BuildContext context) {
-        return BlocBuilder<SportsBloc, SportsState>(
-          builder: (context, state) {
-            if (state is SportsLoading) {
-              return const Center(child: CircularProgressIndicator());
-            }
-            if (state is SportsError) {
-              return Center(child: Text(state.message));
-            }
-            if (state is SportsLoaded) {
-              return StatefulBuilder(
-                builder: (BuildContext context, StateSetter setState) {
-                  return Container(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Row(children: [
-                          Expanded(
-                            child: Text(
-                              'Cabang Olahraga',
-                              textAlign: TextAlign.start,
-                              style: TextStyle(fontFamily: 'Rubik', fontWeight: FontWeight.w600, fontSize: 16.0),
-                            ),
+        context: context,
+        isScrollControlled: true, // This is crucial for making it full-screen
+        builder: (context) {
+          // DraggableScrollableSheet allows the bottom sheet to be dragged
+          // and provides control over its size.
+          return DraggableScrollableSheet(
+            // initialChildSize sets the starting height of the bottom sheet.
+              initialChildSize: 0.6,
+              // minChildSize sets the minimum height of the bottom sheet.
+              minChildSize: 0.25,
+              // maxChildSize sets the maximum height, allowing it to go full screen.
+              maxChildSize: 0.8,
+              expand: false,
+            builder: (BuildContext context, ScrollController scrollController)
+          {
+            return StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) {
+                return Container(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(children: [
+                        Expanded(
+                          child: Text(
+                            'Cabang Olahraga',
+                            textAlign: TextAlign.start,
+                            style: TextStyle(fontFamily: 'Rubik', fontWeight: FontWeight.w600, fontSize: 16.0),
                           ),
-                          GestureDetector(
-                            behavior: HitTestBehavior.opaque,
-                            onTap: (){
-                              Navigator.pop(context);
-                            },
-                            child: Icon(Icons.close),
-                          )
-                        ],),
-                        const SizedBox(height: 16.0),
-                        Card(
-                          elevation: 0.0,
-                          shape: RoundedRectangleBorder(
+                        ),
+                        GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: (){
+                            Navigator.pop(context);
+                          },
+                          child: Icon(Icons.close),
+                        )
+                      ],),
+                      const SizedBox(height: 16.0),
+                      Card(
+                        elevation: 0.0,
+                        shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(5.0)
-                          ),
-                          color: Color(0xFFF1F1F1),
-                          child: Padding(
-                            padding: const EdgeInsets.all(10.0),
-                            child: SizedBox(
-                              width: MediaQuery.of(context).size.width,
-                              child: Text(
-                                'Preferensi Olahragamu',
-                                style: TextStyle(
-                                    fontFamily: 'Rubik',
-                                    fontSize: 14.0,
-                                    fontWeight: FontWeight.w600
-                                ),
+                        ),
+                        color: Color(0xFFF1F1F1),
+                        child: Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: SizedBox(
+                            width: MediaQuery.of(context).size.width,
+                            child: Text(
+                              'Preferensi Olahragamu',
+                              style: TextStyle(
+                                  fontFamily: 'Rubik',
+                                  fontSize: 14.0,
+                                  fontWeight: FontWeight.w600
                               ),
                             ),
                           ),
                         ),
-                        const SizedBox(height: 8.0),
-                        ...state.sportsItems
-                            .where((item) => item.type == 1)
-                            .map((item) =>
-                            ListTile(
-                              leading: Icon(item.icon ?? Icons.sports_tennis),
-                              title: Text(item.name, style: TextStyle(
-                                  fontFamily: 'Rubik',
-                                  fontSize: 12.0,
-                                  fontWeight: FontWeight.w500
-                              )),
-                              trailing: Radio<String>(
-                                value: item.name,
-                                hoverColor: constants.primaryColor,
-                                groupValue: _mainCtrl.selectSportsName.toString(),
-                                activeColor: Colors.purple,
-                                onChanged: (String? value) {
-                                  setState(() {});
-                                  _mainCtrl.selectSportsId.value = item.id;
-                                  _mainCtrl.selectSportsName.value = item.name;
-                                  // context.read<SportsBloc>().add(
-                                  //     SelectSport(value!));
-                                  if(item.id==4){
-                                    _mainCtrl.setHideCat.value = true;
-                                  }else{
-                                    _mainCtrl.setHideCat.value = false;
-                                  }
-                                  Navigator.pop(context);
-                                },
-                              ),
-                              onTap: () {
-                                _mainCtrl.selectSportsId.value = item.id;
-                                _mainCtrl.selectSportsName.value = item.name;
-                                if(item.id==4){
-                                  _mainCtrl.setHideCat.value = true;
-                                }else{
-                                  _mainCtrl.setHideCat.value = false;
-                                }
-                                Navigator.pop(context);
-                              },
-                            )),
-                        const SizedBox(height: 16.0),
-                        Card(
-                          elevation: 0.0,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(5.0)
-                          ),
-                          color: Color(0xFFF1F1F1),
-                          child: Padding(
-                            padding: const EdgeInsets.all(10.0),
-                            child: SizedBox(
-                              width: MediaQuery.of(context).size.width,
-                              child: Text(
-                                'Semua Olahraga',
-                                style: TextStyle(
-                                    fontFamily: 'Rubik',
-                                    fontSize: 14.0,
-                                    fontWeight: FontWeight.w600
+                      ),
+                      const SizedBox(height: 8.0),
+                      Expanded(child:
+                      BlocBuilder<SportsBloc, SportsState>(
+                      builder: (context, state) {
+                      if (state is SportsInit || state is SportsLoading) {
+                      return const Center(child: CircularProgressIndicator());
+                      } else if (state is SportsLoaded) {
+                        return SingleChildScrollView(
+                          controller: scrollController,
+                          child: Column(
+                            children: [
+                              ...state.sportsItems
+                                  .where((item) => item.type == 1)
+                                  .map((item) =>
+                                  ListTile(
+                                    leading: Icon(item.icon ?? Icons.sports_tennis),
+                                    title: Text(item.name, style: TextStyle(
+                                        fontFamily: 'Rubik',
+                                        fontSize: 12.0,
+                                        fontWeight: FontWeight.w500
+                                    )),
+                                    trailing: Radio<String>(
+                                      value: item.name,
+                                      hoverColor: constants.primaryColor,
+                                      groupValue: _mainCtrl.selectSportsName.toString(),
+                                      activeColor: Colors.purple,
+                                      onChanged: (String? value) {
+                                        setState(() {});
+                                        _mainCtrl.selectSportsId.value = item.id;
+                                        _mainCtrl.selectSportsName.value = item.name;
+                                        // context.read<SportsBloc>().add(
+                                        //     SelectSport(value!));
+                                        if (item.id == 4) {
+                                          _mainCtrl.setHideCat.value = true;
+                                        } else {
+                                          _mainCtrl.setHideCat.value = false;
+                                        }
+                                        Navigator.pop(context);
+                                      },
+                                    ),
+                                    onTap: () {
+                                      _mainCtrl.selectSportsId.value = item.id;
+                                      _mainCtrl.selectSportsName.value = item.name;
+                                      if (item.id == 4) {
+                                        _mainCtrl.setHideCat.value = true;
+                                      } else {
+                                        _mainCtrl.setHideCat.value = false;
+                                      }
+                                      Navigator.pop(context);
+                                    },
+                                  )),
+                              const SizedBox(height: 16.0),
+                              Card(
+                                elevation: 0.0,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(5.0)
+                                ),
+                                color: Color(0xFFF1F1F1),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(10.0),
+                                  child: SizedBox(
+                                    width: MediaQuery
+                                        .of(context)
+                                        .size
+                                        .width,
+                                    child: Text(
+                                      'Semua Olahraga',
+                                      style: TextStyle(
+                                          fontFamily: 'Rubik',
+                                          fontSize: 14.0,
+                                          fontWeight: FontWeight.w600
+                                      ),
+                                    ),
+                                  ),
                                 ),
                               ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 8.0),
-                        ...state.sportsItems
-                            .where((item) => item.type == 2)
-                            .map((item) =>
-                            ListTile(
-                              leading: Icon(item.icon ?? Icons.sports_tennis),
-                              title: Text(item.name,style: TextStyle(
-                                  fontFamily: 'Rubik',
-                                  fontSize: 12.0,
-                                  fontWeight: FontWeight.w500
-                              )),
-                              trailing: Radio<String>(
-                                value: item.name,
-                                hoverColor: constants.primaryColor,
-                                groupValue: _mainCtrl.selectSportsName.toString(),
-                                activeColor: Colors.purple,
-                                onChanged: (String? value) {
-                                  setState(() {});
-                                  _mainCtrl.selectSportsId.value = item.id;
-                                  _mainCtrl.selectSportsName.value = item.name;
-                                  if(item.id==4){
-                                    _mainCtrl.setHideCat.value = true;
-                                  }else{
-                                    _mainCtrl.setHideCat.value = false;
-                                  }
-                                  Navigator.pop(context);
-                                },
+                              const SizedBox(height: 8.0),
+                              ...state.sportsItems
+                                  .where((item) => item.type == 2)
+                                  .map((item) =>
+                                  ListTile(
+                                    leading: Icon(item.icon ?? Icons.sports_tennis),
+                                    title: Text(item.name, style: TextStyle(
+                                        fontFamily: 'Rubik',
+                                        fontSize: 12.0,
+                                        fontWeight: FontWeight.w500
+                                    )),
+                                    trailing: Radio<String>(
+                                      value: item.name,
+                                      hoverColor: constants.primaryColor,
+                                      groupValue: _mainCtrl.selectSportsName.toString(),
+                                      activeColor: Colors.purple,
+                                      onChanged: (String? value) {
+                                        setState(() {});
+                                        _mainCtrl.selectSportsId.value = item.id;
+                                        _mainCtrl.selectSportsName.value = item.name;
+                                        if (item.id == 4) {
+                                          _mainCtrl.setHideCat.value = true;
+                                        } else {
+                                          _mainCtrl.setHideCat.value = false;
+                                        }
+                                        Navigator.pop(context);
+                                      },
+                                    ),
+                                    onTap: () {
+                                      _mainCtrl.selectSportsId.value = item.id;
+                                      _mainCtrl.selectSportsName.value = item.name;
+                                      if (item.id == 4) {
+                                        _mainCtrl.setHideCat.value = true;
+                                      } else {
+                                        _mainCtrl.setHideCat.value = false;
+                                      }
+                                      Navigator.pop(context);
+                                    },
+                                  ),
                               ),
-                              onTap: () {
-                                _mainCtrl.selectSportsId.value = item.id;
-                                _mainCtrl.selectSportsName.value = item.name;
-                                if(item.id==4){
-                                  _mainCtrl.setHideCat.value = true;
-                                }else{
-                                  _mainCtrl.setHideCat.value = false;
-                                }
-                                Navigator.pop(context);
-                              },
-                            )),
-                      ],
-                    ),
-                  );
-                },
-              );
-            }
-            return Container();
-          },
-        );
+                            ],
+                          ),
+                        );
+                      }
+                      return const Center(child: Text('Failed to load data'));
+                      })
+                      )
+                    ],
+                  ),
+                );
+              },
+            );
+          });
       },
     );
   }
@@ -670,11 +698,11 @@ class _GlobalBottomsheetState extends State<GlobalBottomsheet> {
         // and provides control over its size.
         return DraggableScrollableSheet(
           // initialChildSize sets the starting height of the bottom sheet.
-          initialChildSize: 0.8,
+          initialChildSize: 0.4,
           // minChildSize sets the minimum height of the bottom sheet.
           minChildSize: 0.25,
           // maxChildSize sets the maximum height, allowing it to go full screen.
-          maxChildSize: 0.8,
+          maxChildSize: 0.6,
           expand: false,
           builder: (BuildContext context, ScrollController scrollController) {
             return Container(
@@ -708,6 +736,7 @@ class _GlobalBottomsheetState extends State<GlobalBottomsheet> {
                     Expanded(
                       // ListView.builder makes the content scrollable
                       child: SingleChildScrollView(
+                        controller: scrollController,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -912,8 +941,8 @@ class _GlobalBottomsheetState extends State<GlobalBottomsheet> {
         isScrollControlled: true,
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(8.0),
-            topRight: Radius.circular(8.0),
+            topLeft: Radius.circular(20.0),
+            topRight: Radius.circular(20.0),
           ),
         ),
         builder: (BuildContext context) {
@@ -1014,7 +1043,7 @@ class _GlobalBottomsheetState extends State<GlobalBottomsheet> {
                               ),
                             ),
                             SizedBox(
-                              height: 30.0,
+                              height: 60.0,
                             ),
                           ],
                         ),
