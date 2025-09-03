@@ -1,3 +1,4 @@
+import 'package:fetestproject/controller/main_controller.dart';
 import 'package:fetestproject/helpers/constants.dart';
 import 'package:fetestproject/helpers/drawable.dart';
 import 'package:fetestproject/helpers/responsive.dart';
@@ -7,6 +8,7 @@ import 'package:fetestproject/services/bloc/rank_bloc.dart';
 import 'package:fetestproject/services/state/rank_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
 
 class LeaderBoardOne extends StatefulWidget {
@@ -17,6 +19,8 @@ class LeaderBoardOne extends StatefulWidget {
 }
 
 class _LeaderBoardOneState extends State<LeaderBoardOne> {
+  final _mainCtrl = Get.find<MainController>();
+
   @override
   void initState() {
     super.initState();
@@ -52,8 +56,8 @@ class _LeaderBoardOneState extends State<LeaderBoardOne> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Flexible(
-                child: Text(
-                  "[Current Season]",
+                child: Obx(()=>Text(
+                  _mainCtrl.selectPeriodeName.value !='' ? _mainCtrl.selectPeriodeName.value : "[Current Season]",
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontFamily: 'Rubik',
@@ -61,7 +65,7 @@ class _LeaderBoardOneState extends State<LeaderBoardOne> {
                     fontSize: 16.0,
                     color: Colors.white,
                   ),
-                ),
+                )),
               ),
               SizedBox(width: 5.0),
               Icon(Icons.arrow_drop_down_circle, color: Colors.white, size: 20.0),
@@ -129,27 +133,15 @@ class _LeaderBoardOneState extends State<LeaderBoardOne> {
               // Top dropdowns
               Padding(
                 padding: const EdgeInsets.only(left: 15.0, right: 15.0),
-                child: Row(
+                child: Obx(()=>Row(
                   children: [
-                    SizedBox(
-                      width: 120.0,
-                      child: _buildDropdown("Mini Soccer", [
-                        "Mini Soccer",
-                        "Futsal",
-                        "Padel",
-                      ], ''),
-                    ),
+                    _buildDropdown("sports"),
+                    _mainCtrl.setHideCat.value ? SizedBox.shrink() : const SizedBox(width: 12),
+                    _mainCtrl.setHideCat.value ? SizedBox.shrink() : _buildDropdown("cat"),
                     const SizedBox(width: 12),
-                    SizedBox(
-                      width: 120.0,
-                      child: _buildDropdown("Surabaya", [
-                        "Surabaya",
-                        "Jakarta",
-                        "Bandung",
-                      ], 'loc'),
-                    ),
+                    _buildDropdown("loc"),
                   ],
-                ),
+                )),
               ),
               const SizedBox(height: 5),
               // Card
@@ -324,33 +316,49 @@ class _LeaderBoardOneState extends State<LeaderBoardOne> {
   }
 
   // Reusable rounded dropdown
-  Widget _buildDropdown(String value, List<String> items, String type) {
-    return Container(
-      height: 30.0,
-      width: type == 'loc' ? 20.0 : 50.0,
-      padding: const EdgeInsets.symmetric(horizontal: 10),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.white),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          value: value,
-          isExpanded: true,
-          icon: const Icon(Icons.keyboard_arrow_down_rounded),
-          items: items
-              .map(
-                (e) => DropdownMenuItem<String>(
-              value: e,
-              child: Text(
-                e,
-                style: TextStyle(fontSize: 12.0, fontFamily: 'Rubik'),
-              ),
-            ),
-          )
-              .toList(),
-          onChanged: (val) {},
+  Widget _buildDropdown(String type) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: type== 'sports' ? (){
+          GlobalBottomsheet().createState().showBottomSheetSelectSports(context);
+        } : type == 'cat' ? (){
+          GlobalBottomsheet().createState().showBottomSheetSelectCategory(context);
+        } : (){
+          GlobalBottomsheet().createState().showBottomSheetSelectCategory(context);
+        },
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          height: 35.0,
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: Colors.white),
+          ),
+          child: Row(
+            children: [
+              Expanded(child: type== 'sports' ? Obx(()=>Text(_mainCtrl.selectSportsName.value,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                fontFamily: 'Rubik',
+                fontWeight: FontWeight.w400,
+                fontSize: 12.0
+              ),)) : type== 'cat' ? Obx(()=>Text(_mainCtrl.selectCatName.value,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                    fontFamily: 'Rubik',
+                    fontWeight: FontWeight.w400,
+                    fontSize: 12.0
+                ),)) : Obx(()=>Text(_mainCtrl.selectLocName.value,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                    fontFamily: 'Rubik',
+                    fontWeight: FontWeight.w400,
+                    fontSize: 12.0
+                ),))),
+              Icon(Icons.keyboard_arrow_down)
+            ],
+          ),
         ),
       ),
     );

@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 enum Trend { up, down, neutral }
 
 class RankModels {

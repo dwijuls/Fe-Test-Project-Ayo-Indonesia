@@ -23,21 +23,21 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //   backgroundColor: constants.primaryColor,
-      //   centerTitle: true,
-      //   title: Text(
-      //     "FE Test Project",
-      //     overflow: TextOverflow.ellipsis,
-      //     style: TextStyle(
-      //       fontFamily: 'Rubik',
-      //       fontWeight: FontWeight.w600,
-      //       fontSize: 16.0,
-      //       color: Colors.white,
-      //     ),
-      //   ),
-      //   elevation: 0,
-      // ),
+      appBar: AppBar(
+        backgroundColor: constants.primaryColor,
+        centerTitle: true,
+        title: Text(
+          "FE Test Project",
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+            fontFamily: 'Rubik',
+            fontWeight: FontWeight.w600,
+            fontSize: 16.0,
+            color: Colors.white,
+          ),
+        ),
+        elevation: 0,
+      ),
       body: ResponsiveLayout(
         mobile: _buildHomeNav(context, crossAxis: 1.0),
         tablet: _buildHomeNav(context, crossAxis: 2.0),
@@ -129,8 +129,8 @@ class _HomePageState extends State<HomePage> {
                                 Padding(
                                   padding: const EdgeInsets.symmetric(horizontal: 10.0),
                                   child: Text(
-                                    'Leaderboard ${index + 1}',
-                                    style: TextStyle(fontFamily: 'Rubik', fontSize: 14.0, color: constants.primaryColor),
+                                    'Variant ${index + 1}',
+                                    style: TextStyle(fontFamily: 'Rubik', fontSize: 14.0, color: constants.primaryColor, fontWeight: FontWeight.w600),
                                   ),
                                 ),
                               ],

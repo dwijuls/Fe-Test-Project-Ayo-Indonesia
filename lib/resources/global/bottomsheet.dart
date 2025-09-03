@@ -1,14 +1,18 @@
+import 'package:fetestproject/controller/main_controller.dart';
 import 'package:fetestproject/helpers/constants.dart';
 import 'package:fetestproject/helpers/drawable.dart';
 import 'package:fetestproject/models/rank_models.dart';
 import 'package:fetestproject/resources/global/separator.dart';
 import 'package:fetestproject/services/bloc/periode_bloc.dart';
 import 'package:fetestproject/services/bloc/rank_bloc.dart';
+import 'package:fetestproject/services/bloc/sports_bloc.dart';
 import 'package:fetestproject/services/event/rank_event.dart';
 import 'package:fetestproject/services/state/periode_state.dart';
 import 'package:fetestproject/services/state/rank_state.dart';
+import 'package:fetestproject/services/state/sports_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -21,6 +25,8 @@ class GlobalBottomsheet extends StatefulWidget {
 
 class _GlobalBottomsheetState extends State<GlobalBottomsheet> {
   final ScrollController _scrollController = ScrollController();
+
+  final _mainCtrl = Get.find<MainController>();
 
   @override
   Widget build(BuildContext context) {
@@ -144,7 +150,6 @@ class _GlobalBottomsheetState extends State<GlobalBottomsheet> {
                     child: Column(
                       children: [
                         // Handle for dragging the sheet
-
                         const SizedBox(height: 16),
                         Row(children: [
                           Expanded(
@@ -181,8 +186,10 @@ class _GlobalBottomsheetState extends State<GlobalBottomsheet> {
                                         behavior: HitTestBehavior.opaque,
                                         onTap: (){
                                           setState(() {
-
+                                            _mainCtrl.selectPeriodeId.value = state.periodeItems[index].id;
+                                            _mainCtrl.selectPeriodeName.value = state.periodeItems[index].name;
                                           });
+                                          Navigator.pop(context);
                                         },
                                         child: Row(
                                           children: [
@@ -195,7 +202,7 @@ class _GlobalBottomsheetState extends State<GlobalBottomsheet> {
                                                 ],
                                               ),
                                             ),
-                                            index == 1 ? Icon(Icons.circle_outlined, color: constants.primaryColor, weight: 900,) : Icon(Icons.circle_outlined, color: Colors.black26,)
+                                            _mainCtrl.selectPeriodeId.value == state.periodeItems[index].id ? Icon(Icons.circle_outlined, color: constants.primaryColor, weight: 900,) : Icon(Icons.circle_outlined, color: Colors.black26,)
                                           ],
                                         ),
                                       ),
@@ -213,6 +220,320 @@ class _GlobalBottomsheetState extends State<GlobalBottomsheet> {
                 );
               },
             );
+          },
+        );
+      },
+    );
+  }
+
+  showBottomSheetSelectCategory(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
+      ),
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return Container(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Title
+                  Row(children: [
+                    Expanded(
+                      child: Text(
+                        'Kategori',
+                        textAlign: TextAlign.start,
+                        style: TextStyle(fontFamily: 'Rubik', fontWeight: FontWeight.w600, fontSize: 16.0),
+                      ),
+                    ),
+                    GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: (){
+                        Navigator.pop(context);
+                      },
+                      child: Icon(Icons.close),
+                    )
+                  ],),
+                  const SizedBox(height: 16.0),
+                  MySeparator(color: Colors.black26,),
+                  const SizedBox(height: 16.0),
+                  // Category: Individu
+                  ListTile(
+                    title: Text('Individu',style: TextStyle(fontFamily: 'Rubik', fontWeight: FontWeight.w400, fontSize: 14.0),),
+                    trailing: Radio<String>(
+                      value: 'Individu',
+                      groupValue: _mainCtrl.selectCatName.value,
+                      activeColor: Colors.purple,
+                      onChanged: (String? value) {
+                        setState(() {
+                          _mainCtrl.selectCatId.value = 1;
+                          _mainCtrl.selectCatName.value = value.toString();
+                        });Navigator.pop(context);
+                      },
+                    ),
+                      onTap: () {
+                        // setState(() {
+                          _mainCtrl.selectCatId.value = 1;
+                          _mainCtrl.selectCatName.value = "Individu";
+                        // });
+                        Navigator.pop(context);
+                      }
+                  ),
+                  // Category: Tunggal
+                  ListTile(
+                    title: Text('Tunggal',style: TextStyle(fontFamily: 'Rubik', fontWeight: FontWeight.w400, fontSize: 14.0),),
+                    trailing: Radio<String>(
+                      value: 'Tunggal',
+                      groupValue: _mainCtrl.selectCatName.value,
+                      activeColor: Colors.purple,
+                      onChanged: (String? value) {
+                        setState(() {
+                          _mainCtrl.selectCatId.value = 2;
+                          _mainCtrl.selectCatName.value = value.toString();
+                        });Navigator.pop(context);
+                      },
+                    ),
+                      onTap: () {
+                        // setState(() {
+                        _mainCtrl.selectCatId.value = 2;
+                        _mainCtrl.selectCatName.value = "Tunggal";
+                        // });
+                        Navigator.pop(context);
+                      }
+                  ),
+                  // Category: Ganda
+                  ListTile(
+                    title: Text('Ganda',style: TextStyle(fontFamily: 'Rubik', fontWeight: FontWeight.w400, fontSize: 14.0),),
+                    trailing: Radio<String>(
+                      value: 'Ganda',
+                      groupValue: _mainCtrl.selectCatName.value,
+                      activeColor: Colors.purple,
+                      onChanged: (String? value) {
+                        setState(() {
+                          _mainCtrl.selectCatId.value = 3;
+                          _mainCtrl.selectCatName.value = value.toString();
+                        });
+                      },
+                    ),
+                      onTap: () {
+                        // setState(() {
+                        _mainCtrl.selectCatId.value = 3;
+                        _mainCtrl.selectCatName.value = "Ganda";
+                        // });
+                        Navigator.pop(context);
+                      }
+                  ),
+                  // Category: Komunitas
+                  ListTile(
+                    title: Text('Komunitas', style: TextStyle(fontFamily: 'Rubik', fontWeight: FontWeight.w600, fontSize: 16.0),),
+                    trailing: Radio<String>(
+                      value: 'Komunitas',
+                      groupValue: _mainCtrl.selectCatName.value,
+                      activeColor: Colors.purple,
+                      onChanged: (String? value) {
+                        setState(() {
+                          _mainCtrl.selectCatId.value = 4;
+                          _mainCtrl.selectCatName.value = value.toString();
+                        });Navigator.pop(context);
+                      },
+                    ),
+                      onTap: () {
+                        // setState(() {
+                        _mainCtrl.selectCatId.value = 4;
+                        _mainCtrl.selectCatName.value = "Komunitas";
+                        // });
+                        Navigator.pop(context);
+                      }
+                  ),
+                  const SizedBox(height: 16.0),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  showBottomSheetSelectSports(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
+      ),
+      builder: (BuildContext context) {
+        return BlocBuilder<SportsBloc, SportsState>(
+          builder: (context, state) {
+            if (state is SportsLoading) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (state is SportsError) {
+              return Center(child: Text(state.message));
+            }
+            if (state is SportsLoaded) {
+              return StatefulBuilder(
+                builder: (BuildContext context, StateSetter setState) {
+                  return Container(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Row(children: [
+                          Expanded(
+                            child: Text(
+                              'Cabang Olahraga',
+                              textAlign: TextAlign.start,
+                              style: TextStyle(fontFamily: 'Rubik', fontWeight: FontWeight.w600, fontSize: 16.0),
+                            ),
+                          ),
+                          GestureDetector(
+                            behavior: HitTestBehavior.opaque,
+                            onTap: (){
+                              Navigator.pop(context);
+                            },
+                            child: Icon(Icons.close),
+                          )
+                        ],),
+                        const SizedBox(height: 16.0),
+                        Card(
+                          elevation: 0.0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5.0)
+                          ),
+                          color: Color(0xFFF1F1F1),
+                          child: Padding(
+                            padding: const EdgeInsets.all(10.0),
+                            child: SizedBox(
+                              width: MediaQuery.of(context).size.width,
+                              child: Text(
+                                'Preferensi Olahragamu',
+                                style: TextStyle(
+                                    fontFamily: 'Rubik',
+                                    fontSize: 14.0,
+                                    fontWeight: FontWeight.w600
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 8.0),
+                        ...state.sportsItems
+                            .where((item) => item.type == 1)
+                            .map((item) =>
+                            ListTile(
+                              leading: Icon(item.icon ?? Icons.sports_tennis),
+                              title: Text(item.name, style: TextStyle(
+                                  fontFamily: 'Rubik',
+                                  fontSize: 12.0,
+                                  fontWeight: FontWeight.w500
+                              )),
+                              trailing: Radio<String>(
+                                value: item.name,
+                                hoverColor: constants.primaryColor,
+                                groupValue: _mainCtrl.selectSportsName.toString(),
+                                activeColor: Colors.purple,
+                                onChanged: (String? value) {
+                                  setState(() {});
+                                  _mainCtrl.selectSportsId.value = item.id;
+                                  _mainCtrl.selectSportsName.value = item.name;
+                                  // context.read<SportsBloc>().add(
+                                  //     SelectSport(value!));
+                                  if(item.id==4){
+                                    _mainCtrl.setHideCat.value = true;
+                                  }else{
+                                    _mainCtrl.setHideCat.value = false;
+                                  }
+                                  Navigator.pop(context);
+                                },
+                              ),
+                              onTap: () {
+                                _mainCtrl.selectSportsId.value = item.id;
+                                _mainCtrl.selectSportsName.value = item.name;
+                                if(item.id==4){
+                                  _mainCtrl.setHideCat.value = true;
+                                }else{
+                                  _mainCtrl.setHideCat.value = false;
+                                }
+                                Navigator.pop(context);
+                              },
+                            )),
+                        const SizedBox(height: 16.0),
+                        Card(
+                          elevation: 0.0,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(5.0)
+                          ),
+                          color: Color(0xFFF1F1F1),
+                          child: Padding(
+                            padding: const EdgeInsets.all(10.0),
+                            child: SizedBox(
+                              width: MediaQuery.of(context).size.width,
+                              child: Text(
+                                'Semua Olahraga',
+                                style: TextStyle(
+                                    fontFamily: 'Rubik',
+                                    fontSize: 14.0,
+                                    fontWeight: FontWeight.w600
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 8.0),
+                        ...state.sportsItems
+                            .where((item) => item.type == 2)
+                            .map((item) =>
+                            ListTile(
+                              leading: Icon(item.icon ?? Icons.sports_tennis),
+                              title: Text(item.name,style: TextStyle(
+                                  fontFamily: 'Rubik',
+                                  fontSize: 12.0,
+                                  fontWeight: FontWeight.w500
+                              )),
+                              trailing: Radio<String>(
+                                value: item.name,
+                                hoverColor: constants.primaryColor,
+                                groupValue: _mainCtrl.selectSportsName.toString(),
+                                activeColor: Colors.purple,
+                                onChanged: (String? value) {
+                                  setState(() {});
+                                  _mainCtrl.selectSportsId.value = item.id;
+                                  _mainCtrl.selectSportsName.value = item.name;
+                                  if(item.id==4){
+                                    _mainCtrl.setHideCat.value = true;
+                                  }else{
+                                    _mainCtrl.setHideCat.value = false;
+                                  }
+                                  Navigator.pop(context);
+                                },
+                              ),
+                              onTap: () {
+                                _mainCtrl.selectSportsId.value = item.id;
+                                _mainCtrl.selectSportsName.value = item.name;
+                                if(item.id==4){
+                                  _mainCtrl.setHideCat.value = true;
+                                }else{
+                                  _mainCtrl.setHideCat.value = false;
+                                }
+                                Navigator.pop(context);
+                              },
+                            )),
+                      ],
+                    ),
+                  );
+                },
+              );
+            }
+            return Container();
           },
         );
       },
