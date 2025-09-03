@@ -4,10 +4,13 @@ import 'package:fetestproject/helpers/drawable.dart';
 import 'package:fetestproject/models/rank_models.dart';
 import 'package:fetestproject/resources/global/separator.dart';
 import 'package:fetestproject/services/bloc/periode_bloc.dart';
+import 'package:fetestproject/services/bloc/province_bloc.dart';
 import 'package:fetestproject/services/bloc/rank_bloc.dart';
 import 'package:fetestproject/services/bloc/sports_bloc.dart';
+import 'package:fetestproject/services/event/province_event.dart';
 import 'package:fetestproject/services/event/rank_event.dart';
 import 'package:fetestproject/services/state/periode_state.dart';
+import 'package:fetestproject/services/state/province_state.dart';
 import 'package:fetestproject/services/state/rank_state.dart';
 import 'package:fetestproject/services/state/sports_state.dart';
 import 'package:flutter/material.dart';
@@ -358,6 +361,124 @@ class _GlobalBottomsheetState extends State<GlobalBottomsheet> {
           },
         );
       },
+    );
+  }
+
+  showProvinceBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
+      ),
+      builder: (context) => BlocBuilder<ProvinceBloc, ProvinceState>(
+        builder: (context, state) {
+          if (state is ProvinceLoading) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (state is ProvinceError) {
+            return Center(child: Text(state.message));
+          } else if (state is ProvinceLoaded) {
+            return DraggableScrollableSheet(
+              initialChildSize: 0.4,
+              // minChildSize sets the minimum height of the bottom sheet.
+              minChildSize: 0.25,
+              // maxChildSize sets the maximum height, allowing it to go full screen.
+              maxChildSize: 0.7,
+                expand: false,
+                builder: (BuildContext context, ScrollController scrollController) {
+                return Container(
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                'Pilih Region',
+                                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.close),
+                                onPressed: () => Navigator.pop(context),
+                              ),
+                            ],
+                          ),
+                        ),
+                        if (state.isListView)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: TextField(
+                              decoration: InputDecoration(
+                                hintText: 'Cari nama kota',
+                                prefixIcon: const Icon(Icons.search),
+                                suffixIcon: IconButton(
+                                  icon: const Icon(Icons.clear),
+                                  onPressed: () => context.read<ProvinceBloc>().add(SearchProvinces('')),
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              onChanged: (value) {
+                                context.read<ProvinceBloc>().add(SearchProvinces(value));
+                              },
+                            ),
+                          ),
+                        Expanded(
+                          child: state.isListView
+                              ? ListView.builder(
+                            physics: AlwaysScrollableScrollPhysics(),
+                            itemCount: state.provinces.length,
+                            itemBuilder: (context, index) {
+                              final province = state.provinces[index];
+                              return ListTile(
+                                title: Text(province.nama!),
+                                onTap: () {
+                                  _mainCtrl.selectLocId.value = int.parse(province.id.toString());
+                                  _mainCtrl.selectLocName.value = province.nama.toString();
+                                  context.read<ProvinceBloc>().add(SelectProvince(province.nama!));
+                                  Navigator.pop(context);
+                                },
+                              );
+                            },
+                          )
+                              : GestureDetector(
+                            onTap: () => context.read<ProvinceBloc>().add(ToggleViewMode()),
+                            child: Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Wrap(
+                                spacing: 8,
+                                runSpacing: 8,
+                                children: state.provinces.take(7).map((province) {
+                                  return ChoiceChip(
+                                      label: Text(province.nama!.toString(),
+                                      ), selected: state.selectedProvince == province.nama!,
+                                      onSelected: (selected) {
+                                        _mainCtrl.selectLocId.value = int.parse(province.id.toString());
+                                        _mainCtrl.selectLocName.value = province.nama.toString();
+                                        context.read<ProvinceBloc>().add(SelectProvince(province.nama!));
+                                        Navigator.pop(context);
+                                      });
+                                }).toList(),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+            );
+          }
+          return const SizedBox.shrink();
+        },
+      ),
     );
   }
 

@@ -2,13 +2,16 @@ import 'package:fetestproject/resources/views/empty/empty.dart';
 import 'package:fetestproject/resources/views/home/home.dart';
 import 'package:fetestproject/resources/views/leaderboard_one/leaderboard_one.dart';
 import 'package:fetestproject/services/bloc/periode_bloc.dart';
+import 'package:fetestproject/services/bloc/province_bloc.dart';
 import 'package:fetestproject/services/bloc/rank_bloc.dart';
 import 'package:fetestproject/services/bloc/sports_bloc.dart';
 import 'package:fetestproject/services/event/periode_event.dart';
+import 'package:fetestproject/services/event/province_event.dart';
 import 'package:fetestproject/services/event/rank_event.dart';
 import 'package:fetestproject/services/event/sports_event.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:http/http.dart' as http;
 
 final router = GoRouter(
   routes: [
@@ -27,7 +30,8 @@ final router = GoRouter(
         providers: [
           BlocProvider(create: (_) => RankBloc()..add(FetchRankEvent()),),
           BlocProvider(create: (_) => PeriodeBloc()..add(FetchPeriodeEvent()),),
-          BlocProvider(create: (_) => SportsBloc()..add(FetchSportsEvent()),)
+          BlocProvider(create: (_) => SportsBloc()..add(FetchSportsEvent()),),
+          BlocProvider(create: (_) => ProvinceBloc()..add(FetchProvincesEvent()),)
         ],
         child: const LeaderBoardOne(),
       ),
@@ -38,7 +42,8 @@ final router = GoRouter(
         providers: [
           BlocProvider(create: (_) => RankBloc()..add(FetchRankEvent()),),
           BlocProvider(create: (_) => PeriodeBloc()..add(FetchPeriodeEvent()),),
-          BlocProvider(create: (_) => SportsBloc()..add(FetchSportsEvent()),)
+          BlocProvider(create: (_) => SportsBloc()..add(FetchSportsEvent()),),
+          BlocProvider(create: (_) => ProvinceBloc()..add(FetchProvincesEvent()),)
         ],
         child: const LeaderBoardOne(),
       ),
@@ -49,7 +54,8 @@ final router = GoRouter(
         providers: [
           BlocProvider(create: (_) => RankBloc()..add(FetchRankEvent()),),
           BlocProvider(create: (_) => PeriodeBloc()..add(FetchPeriodeEvent()),),
-          BlocProvider(create: (_) => SportsBloc()..add(FetchSportsEvent()),)
+          BlocProvider(create: (_) => SportsBloc()..add(FetchSportsEvent()),),
+          BlocProvider(create: (_) => ProvinceBloc()..add(FetchProvincesEvent()),)
         ],
         child: const LeaderBoardOne(),
       ),
@@ -60,7 +66,8 @@ final router = GoRouter(
         providers: [
           BlocProvider(create: (_) => RankBloc()..add(FetchRankEvent()),),
           BlocProvider(create: (_) => PeriodeBloc()..add(FetchPeriodeEvent()),),
-          BlocProvider(create: (_) => SportsBloc()..add(FetchSportsEvent()),)
+          BlocProvider(create: (_) => SportsBloc()..add(FetchSportsEvent()),),
+          BlocProvider(create: (_) => ProvinceBloc()..add(FetchProvincesEvent()),)
         ],
         child: const EmptyPage(),
       ),

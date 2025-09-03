@@ -324,7 +324,7 @@ class _LeaderBoardOneState extends State<LeaderBoardOne> {
         } : type == 'cat' ? (){
           GlobalBottomsheet().createState().showBottomSheetSelectCategory(context);
         } : (){
-          GlobalBottomsheet().createState().showBottomSheetSelectCategory(context);
+          GlobalBottomsheet().createState().showProvinceBottomSheet(context);
         },
         behavior: HitTestBehavior.opaque,
         child: Container(
