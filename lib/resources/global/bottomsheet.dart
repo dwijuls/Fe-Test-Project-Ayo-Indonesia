@@ -493,14 +493,7 @@ class _GlobalBottomsheetState extends State<GlobalBottomsheet> {
                                               runSpacing: 8,
                                               children: state.provinces.take(5).map((province) {
                                                 return ChoiceChip(
-                                                  label: GestureDetector(
-                                                      behavior: HitTestBehavior.opaque,
-                                                      onTap: (){
-                                                        _mainCtrl.selectLocId.value = int.parse(province.id.toString());
-                                                        _mainCtrl.selectLocName.value = province.nama.toString();
-                                                        Navigator.pop(context);
-                                                      },
-                                                      child: Text(province.nama!)),
+                                                  label: Text(province.nama!),
                                                   selected: state.selectedProvince == province.nama,
                                                   onSelected: (selected) {
                                                     _mainCtrl.selectLocId.value = int.parse(province.id.toString());
