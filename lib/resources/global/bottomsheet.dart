@@ -28,8 +28,26 @@ class GlobalBottomsheet extends StatefulWidget {
 
 class _GlobalBottomsheetState extends State<GlobalBottomsheet> {
   final ScrollController _scrollController = ScrollController();
+  FocusNode myFocusNode = FocusNode();
+
+  final TextEditingController search = TextEditingController();
 
   final _mainCtrl = Get.find<MainController>();
+
+  @override
+  void initState() {
+    super.initState();
+    myFocusNode.addListener(() {
+      if (myFocusNode.hasFocus) {
+        // TextField has gained focus (user clicked or tabbed into it)
+        // Perform actions here, e.g., select all text, show a specific UI.
+        print("TextField gained focus!");
+      } else {
+        // TextField has lost focus
+        print("TextField lost focus!");
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -373,123 +391,143 @@ class _GlobalBottomsheetState extends State<GlobalBottomsheet> {
       ),
       builder: (context) {
         return DraggableScrollableSheet(
-        // initialChildSize sets the starting height of the bottom sheet.
-        initialChildSize: 0.4,
-        // minChildSize sets the minimum height of the bottom sheet.
-        minChildSize: 0.25,
-        // maxChildSize sets the maximum height, allowing it to go full screen.
-        maxChildSize: 0.8,
-        expand: false,
-        builder: (BuildContext context, ScrollController scrollController) {
-        return StatefulBuilder(
-        builder: (BuildContext context, StateSetter setState) {
-          return BlocBuilder<ProvinceBloc, ProvinceState>(
-          builder: (context, state) {
-          if (state is ProvinceLoading) {
-          return const Center(child: CircularProgressIndicator());
-          } else if (state is ProvinceError) {
-          return Center(child: Text(state.message));
-          } else if (state is ProvinceLoaded) {
-            return Container(
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          'Pilih Region',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          // initialChildSize sets the starting height of the bottom sheet.
+          initialChildSize: 0.6,
+          // minChildSize sets the minimum height of the bottom sheet.
+          minChildSize: 0.25,
+          // maxChildSize sets the maximum height, allowing it to go full screen.
+          maxChildSize: 0.8,
+          expand: false,
+          builder: (BuildContext context, ScrollController scrollController) {
+            return StatefulBuilder(
+                builder: (BuildContext context, StateSetter setState) {
+                  return StatefulBuilder(
+                    builder: (BuildContext context, StateSetter setState) {
+                      return Container(
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
                         ),
-                        IconButton(
-                          icon: const Icon(Icons.close),
-                          onPressed: () => Navigator.pop(context),
-                        ),
-                      ],
-                    ),
-                  ),
-                  if (state.isListView)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: TextField(
-                        decoration: InputDecoration(
-                          hintText: 'Cari nama kota',
-                          prefixIcon: const Icon(Icons.search),
-                          suffixIcon: IconButton(
-                            icon: const Icon(Icons.clear),
-                            onPressed: () =>
-                                context.read<ProvinceBloc>().add(SearchProvinces('')),
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        onChanged: (value) {
-                          context.read<ProvinceBloc>().add(SearchProvinces(value));
-                        },
-                      ),
-                    ),
-                  Expanded(
-                    child: state.isListView
-                        ? ListView.builder(
-                      physics: AlwaysScrollableScrollPhysics(),
-                      itemCount: state.provinces.length,
-                      itemBuilder: (context, index) {
-                        final province = state.provinces[index];
-                        return ListTile(
-                          title: Text(province.nama!),
-                          onTap: () {
-                            _mainCtrl.selectLocId.value =
-                                int.parse(province.id.toString());
-                            _mainCtrl.selectLocName.value = province.nama.toString();
-                            context.read<ProvinceBloc>().add(
-                                SelectProvince(province.nama!));
-                            Navigator.pop(context);
-                          },
-                        );
-                      },
-                    )
-                        : GestureDetector(
-                      onTap: () => context.read<ProvinceBloc>().add(ToggleViewMode()),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Wrap(
-                          spacing: 8,
-                          runSpacing: 8,
-                          children: state.provinces.take(7).map((province) {
-                            return ChoiceChip(
-                                label: Text(province.nama!.toString(),
+                        child: Padding(
+                          padding: const EdgeInsets.all(15.0),
+                          child: Column(
+                            children: [
+                              // Handle for dragging the sheet
+                              const SizedBox(height: 16),
+                              Row(children: [
+                                Expanded(
+                                  child: Text(
+                                    'Pilih Region',
+                                    textAlign: TextAlign.start,
+                                    style: TextStyle(fontFamily: 'Rubik', fontWeight: FontWeight.w600, fontSize: 16.0),
+                                  ),
                                 ),
-                                selected: state.selectedProvince == province.nama!,
-                                onSelected: (selected) {
-                                  _mainCtrl.selectLocId.value =
-                                      int.parse(province.id.toString());
-                                  _mainCtrl.selectLocName.value =
-                                      province.nama.toString();
-                                  context.read<ProvinceBloc>().add(
-                                      SelectProvince(province.nama!));
-                                  Navigator.pop(context);
-                                });
-                          }).toList(),
+                                GestureDetector(
+                                  behavior: HitTestBehavior.opaque,
+                                  onTap: (){
+                                    Navigator.pop(context);
+                                  },
+                                  child: Icon(Icons.close),
+                                )
+                              ],),
+                              const SizedBox(height: 16),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 0),
+                                child: TextField(
+                                  controller: search,
+                                  autofocus: true,
+                                  focusNode: myFocusNode,
+                                  decoration: InputDecoration(
+                                    hintText: 'Cari nama kota',
+                                    prefixIcon: const Icon(Icons.search),
+                                    suffixIcon: IconButton(
+                                      icon: const Icon(Icons.clear),
+                                      onPressed: () {
+                                        search.clear();
+                                        context.read<ProvinceBloc>().add(SearchProvinces(''));
+                                      },
+                                    ),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                  ),
+                                  onChanged: (value) {
+                                    context.read<ProvinceBloc>().add(SearchProvinces(value));
+                                  },
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              Expanded(
+                                child: BlocBuilder<ProvinceBloc, ProvinceState>(
+                                  builder: (context, state) {
+                                    if (state is ProvinceInitial || state is ProvinceLoading) {
+                                      return const Center(child: CircularProgressIndicator());
+                                    } else if (state is ProvinceLoaded) {
+                                      return SingleChildScrollView(
+                                        controller: scrollController,
+                                        child: state.isListView
+                                            ? ListView.builder(
+                                          shrinkWrap: true,
+                                          physics: ClampingScrollPhysics(),
+                                          // controller: scrollController,
+                                          itemCount: state.filteredProvinces.length,
+                                          itemBuilder: (context, index) {
+                                            final province = state.filteredProvinces[index];
+                                            return ListTile(
+                                              title: Text(province.nama!),
+                                              onTap: () {
+                                                _mainCtrl.selectLocId.value = int.parse(province.id.toString());
+                                                _mainCtrl.selectLocName.value = province.nama.toString();
+                                                context.read<ProvinceBloc>().add(SelectProvince(province.nama!));
+                                                Navigator.pop(context);
+                                              },
+                                            );
+                                          },
+                                        )
+                                            : GestureDetector(
+                                          onTap: () => context.read<ProvinceBloc>().add(ToggleViewMode()),
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(10),
+                                            child: Wrap(
+                                              spacing: 8,
+                                              runSpacing: 8,
+                                              children: state.provinces.take(5).map((province) {
+                                                return ChoiceChip(
+                                                  label: GestureDetector(
+                                                      behavior: HitTestBehavior.opaque,
+                                                      onTap: (){
+                                                        _mainCtrl.selectLocId.value = int.parse(province.id.toString());
+                                                        _mainCtrl.selectLocName.value = province.nama.toString();
+                                                        Navigator.pop(context);
+                                                      },
+                                                      child: Text(province.nama!)),
+                                                  selected: state.selectedProvince == province.nama,
+                                                  onSelected: (selected) {
+                                                    _mainCtrl.selectLocId.value = int.parse(province.id.toString());
+                                                    _mainCtrl.selectLocName.value = province.nama.toString();
+                                                    Navigator.pop(context);
+                                                    context.read<ProvinceBloc>().add(SelectProvince(province.nama!));
+                                                  },
+                                                );
+                                              }).toList(),
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                    return const Center(child: Text('Failed to load data'));
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }
-          return const SizedBox.shrink();});
-        });
-        }
-        );
-      }
+                      );
+                    },
+                  );
+                });
+          });
+      },
     );
   }
 
