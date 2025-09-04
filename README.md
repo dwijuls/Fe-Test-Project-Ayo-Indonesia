@@ -1,4 +1,4 @@
-# FE Test Project Ayo Indonesia
+# FE Test Project
 
 A new Flutter project.
 
